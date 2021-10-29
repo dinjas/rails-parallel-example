@@ -5,7 +5,7 @@ steps:
     parallelism: 5
     plugins:
       - docker#v3.0.0:
-         image: "ruby:2.7.2"
+          image: "ruby:2.7.2"
           workdir: "/app"
           env:
             - KNAPSACK_GENERATE_REPORT=true
