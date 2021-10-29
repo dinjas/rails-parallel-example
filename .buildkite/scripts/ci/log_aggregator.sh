@@ -76,7 +76,7 @@ class LogAggregator
       puts aggregate_report
 
       puts "--- Writing new report for #{prefix}"
-      File.write("#{prefix}.json", aggregate_report.to_json)
+      File.write("log/#{prefix}.json", aggregate_report.to_json)
     end
   end
 

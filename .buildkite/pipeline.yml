@@ -21,7 +21,7 @@ steps:
 
   - label: "aggregate logs"
     command: ".buildkite/scripts/ci/log_aggregator.sh"
-    artifact_paths: "log/**/*.log"
+    artifact_paths: "log/**/*.json"
     key: aggregate
     plugins:
       - docker#v3.0.0:
