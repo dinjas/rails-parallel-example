@@ -52,7 +52,8 @@ class LogAggregator
     puts "--- Finding knapsack artifacts in build #{BUILD}"
     puts "FOO: #{FOO}"
     puts GRAPHQL
-    json = request(API, data: { query: GRAPHQL }, headers: HEADERS, method: "POST")
+    body = request(API, data: { query: GRAPHQL }, headers: HEADERS, method: "POST")
+    json = JSON.parse(body)
     jobs = json.dig('data', 'build', 'jobs', 'edges').map { |edge| edge['node'] }
     @artifacts = jobs.flat_map { |job| job.dig('artifacts', 'edges') }.map { |edge| edge['node'] }
   end
