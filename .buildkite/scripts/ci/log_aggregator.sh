@@ -68,8 +68,8 @@ class LogAggregator
         puts "unable to parse: '#{line}'"
       end
     end
-    puts "report"
-    puts report
+    puts "aggregate_report"
+    puts aggregate_report
 
     # puts "--- Writing new #{REPORT} for current tests"
     # agregate_report.select! { |test, _time| File.exist?(test) }
