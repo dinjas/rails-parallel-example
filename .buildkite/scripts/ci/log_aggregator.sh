@@ -76,8 +76,7 @@ class LogAggregator
       puts aggregate_report
 
       puts "--- Writing new report for #{prefix}"
-      json_content = JSON.pretty_generate(aggregate_report.sort.to_h)
-      # File.write("#{prefix}.json", json_content)
+      File.write("#{prefix}.json", aggregate_report.to_json)
     end
   end
 
