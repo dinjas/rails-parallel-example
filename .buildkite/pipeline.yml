@@ -5,26 +5,30 @@ steps:
     parallelism: 5
     plugins:
       - docker#v3.0.0:
-          image: "ruby:2.7.2"
-          workdir: "/app"
           environment:
             - KNAPSACK_GENERATE_REPORT=true
             - BUILDKITE_PARALLEL_JOB
             - BUILDKITE_PARALLEL_JOB_COUNT
             - BUILDKITE_BUILD_ID
             - BUILDKITE_BUILD_NUMBER
+          image: "ruby:2.7.2"
           volumes:
             - ./knapsack_rspec_report.json:/app/knapsack_rspec_report.json
             - ./log:/app/log
+          workdir: "/app"
   - wait
 
   - label: "aggregate logs"
     command: ".buildkite/scripts/ci/log_aggregator.sh"
-    artifact_paths: "log/**/*.json"
+    artifact_paths: "log/**/*.log"
     key: aggregate
     plugins:
       - docker#v3.0.0:
+          environment:
+            - BUILDKITE_BUILD_NUMBER
+            - BUILDKITE_ORGANIZATION_SLUG
+            - BUILDKITE_PIPELINE_SLUG
           image: "ruby:2.7.2"
-          workdir: "/app"
           volumes:
             - ./log:/app/log
+          workdir: "/app"
