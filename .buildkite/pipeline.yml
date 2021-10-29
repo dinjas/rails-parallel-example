@@ -2,3 +2,12 @@ steps:
   - name: ":rspec:"
     command: "scripts/ci/setup.sh && scripts/ci/parallel_specs.sh"
     parallelism: 20
+    plugins:
+      - docker#v3.0.0:
+          image: "ruby:2.7.2"
+          workdir: "/app"
+          env:
+            - KNAPSACK_GENERATE_REPORT=true
+          volumes:
+            - ./knapsack_rspec_report.json:/app/knapsack_rspec_report.json
+            - ./log:/app/log
