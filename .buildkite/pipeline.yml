@@ -9,7 +9,7 @@ steps:
           workdir: "/app"
           environment:
             - KNAPSACK_GENERATE_REPORT=true
-            - BUILDKITE_PARALLE_JOB
+            - BUILDKITE_PARALLEL_JOB
             - BUILDKITE_PARALLEL_JOB_COUNT
             - BUILDKITE_BUILD_ID
             - BUILDKITE_BUILD_NUMBER
