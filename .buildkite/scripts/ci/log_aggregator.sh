@@ -14,6 +14,7 @@ class LogAggregator
   MAX_PER_PAGE = 500
   ORGANIZATION = ENV.fetch('BUILDKITE_ORGANIZATION_SLUG', 'hint')
   PIPELINE     = ENV.fetch('BUILDKITE_PIPELINE_SLUG', 'buildkite-playground')
+  REPORTS      = %w[testA testB]
 
   GRAPHQL = <<~GRAPHQL
     query {
@@ -56,25 +57,28 @@ class LogAggregator
   end
 
   def aggregate_logs
-    aggregate_report = @artifacts.each_with_object([]) do |artifact, report|
-      puts "~~~ Downloading artifact #{artifact['uuid']}"
-      body = request(artifact['downloadURL'])
-      # puts body
-      body.each_line do |line|
-        json = JSON.parse(line)
-        #puts json
-        report << json
-      rescue JSON::ParserError => _e
-        puts "unable to parse: '#{line}'"
-      end
-    end
-    puts "aggregate_report"
-    puts aggregate_report
+    REPORTS.each do |prefix|
+      aggregate_report = @artifacts.each_with_object([]) do |artifact, report|
+        next unless artifact['path'].start_with?("log/#{prefix}-")
 
-    # puts "--- Writing new #{REPORT} for current tests"
-    # agregate_report.select! { |test, _time| File.exist?(test) }
-    # json = JSON.pretty_generate(aggregate_report.sort.to_h)
-    # File.write('jason_report.json', json)
+        puts "~~~ Downloading artifact #{artifact['uuid']}, #{artifact['path']}"
+        body = request(artifact['downloadURL'])
+        # puts body
+        body.each_line do |line|
+          json = JSON.parse(line)
+          #puts json
+          report << json
+        rescue JSON::ParserError => _e
+          puts "unable to parse: '#{line}'"
+        end
+      end
+      puts "aggregate_report"
+      puts aggregate_report
+
+      puts "--- Writing new #{REPORT} for #{prefix}"
+      json_content = JSON.pretty_generate(aggregate_report.sort.to_h)
+      # File.write("#{prefix}.json", json_content)
+    end
   end
 
   def request(url, data: nil, headers: {}, method: 'GET')
