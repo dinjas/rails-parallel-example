@@ -59,15 +59,17 @@ class LogAggregator
 
   def aggregate_logs
     aggregate_report = @artifacts.each_with_object({}) do |artifact, report|
-      #next unless artifact['path'] == REPORT_DIFF
       puts "~~~ Downloading artifact #{artifact['uuid']}"
-      report.update request(artifact['downloadURL'])
+      body = request
+      puts "body"
+      puts body
+      #report.update request(artifact['downloadURL'])
     end
 
-    puts "--- Writing new #{REPORT} for current tests"
-    agregate_report.select! { |test, _time| File.exist?(test) }
-    json = JSON.pretty_generate(aggregate_report.sort.to_h)
-    File.write('jason_report.json', json)
+    #puts "--- Writing new #{REPORT} for current tests"
+    #agregate_report.select! { |test, _time| File.exist?(test) }
+    #json = JSON.pretty_generate(aggregate_report.sort.to_h)
+    #File.write('jason_report.json', json)
   end
 
   def request(url, data: nil, headers: {}, method: 'GET')
@@ -78,7 +80,8 @@ class LogAggregator
     response = http.send_request(method, uri.request_uri, data, headers)
     puts response.code
     puts response.body
-    response.body.empty? ? {} : JSON.parse(response.body)
+    response.body
+    # response.body.empty? ? {} : JSON.parse(response.body)
   end
 end
 
