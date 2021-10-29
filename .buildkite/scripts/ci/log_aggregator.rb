@@ -41,7 +41,6 @@ class LogAggregator
   GRAPHQL
 
   def run
-    #puts ENV.select{ |k,v| k.start_with?('BUILDKITE') }.to_h
     find_knapsack_artifacts
     aggregate_logs
   end
@@ -50,44 +49,64 @@ class LogAggregator
 
   def find_knapsack_artifacts
     puts "--- Finding knapsack artifacts in build #{BUILD}"
-    body = request(API, data: { query: GRAPHQL }, headers: HEADERS, method: "POST")
-    json = JSON.parse(body)
-    jobs = json.dig('data', 'build', 'jobs', 'edges').map { |edge| edge['node'] }
-    @artifacts = jobs.flat_map { |job| job.dig('artifacts', 'edges') }.map { |edge| edge['node'] }
+
+    @artifacts = pipeline_artifacts
+  end
+
+  def pipeline_artifacts
+    jobs.flat_map do |job|
+      job.dig('artifacts', 'edges').map do |edge|
+        edge.fetch('node')
+      end
+    end
+  end
+
+  def jobs
+    query_json.dig('data', 'build', 'jobs', 'edges').map do |edge|
+      edge.fetch('node')
+    end
+  end
+
+  def query_json
+    JSON.parse(query_result)
+  end
+
+  def query_result
+    request(API, data: { query: GRAPHQL }, headers: HEADERS, method: "POST")
   end
 
   def aggregate_logs
     REPORTS.each do |prefix|
-      aggregate_report = @artifacts.each_with_object([]) do |artifact, report|
-        next unless artifact['path'].start_with?("log/#{prefix}-")
-
-        puts "~~~ Downloading artifact #{artifact['uuid']}, #{artifact['path']}"
-        body = request(artifact['downloadURL'])
-        # puts body
-        body.each_line do |line|
-          json = JSON.parse(line)
-          #puts json
-          report << json
-        rescue JSON::ParserError => _e
-          puts "unable to parse: '#{line}'"
-        end
-      end
-      puts "aggregate_report"
-      puts aggregate_report
+      report = aggregate_report(prefix)
+      next if report.empty?
 
       puts "--- Writing new report for #{prefix}"
-      File.write("log/#{prefix}.json", aggregate_report.to_json)
+      File.write("log/#{prefix}.json", report.to_json)
     end
+  end
+
+  def aggregate_report(prefix)
+    @artifacts.each_with_object([]) do |artifact, report|
+      next unless artifact['path'].start_with?("log/#{prefix}-")
+
+      artifact_content(artifact).each_line do |line|
+        report << JSON.parse(line)
+      rescue JSON::ParserError => _e
+        puts "unable to parse: '#{line}'"
+      end
+    end
+  end
+
+  def artifact_content(artifact)
+    puts "~~~ Downloading artifact #{artifact['uuid']}, #{artifact['path']}"
+    request(artifact['downloadURL'])
   end
 
   def request(url, data: nil, headers: {}, method: 'GET')
     uri = URI(url)
-    data &&= JSON.generate(data)
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
-    response = http.send_request(method, uri.request_uri, data, headers)
-    # puts response.code
-    # puts response.body
+    response = http.send_request(method, uri.request_uri, data&.to_json, headers)
     response.body
   end
 end

@@ -20,7 +20,7 @@ steps:
   - wait
 
   - label: "aggregate logs"
-    command: ".buildkite/scripts/ci/log_aggregator.sh"
+    command: ".buildkite/scripts/ci/log_aggregator.rb"
     artifact_paths: "log/**/*.json"
     key: aggregate
     plugins:
