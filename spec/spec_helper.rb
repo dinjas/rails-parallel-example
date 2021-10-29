@@ -5,10 +5,13 @@ require 'logger'
 
 Knapsack::Adapters::RSpecAdapter.bind
 
-LOGGER = Logger.new("log/test-#{ENV.fetch('BUILDKITE_PARALLEL_JOB', 0)}.log")
-LOGGER.formatter = -> (_severity, _datetime, _progname, msg) do
+LOGGER1 = Logger.new("log/test1-#{ENV.fetch('BUILDKITE_PARALLEL_JOB', 0)}.log")
+LOGGER2 = Logger.new("log/test2-#{ENV.fetch('BUILDKITE_PARALLEL_JOB', 0)}.log")
+LOGGER1.formatter = -> (_severity, _datetime, _progname, msg) do
   "#{msg.to_json}\n"
 end
+LOGGER2.formatter = LOGGER1.formatter
+
 KEYS = %i[foo bar baz qux].freeze
 
-LOGGER.debug(env: ENV.to_h)
+LOGGER1.debug(env: ENV.to_h)
