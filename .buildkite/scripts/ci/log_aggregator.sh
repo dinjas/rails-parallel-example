@@ -40,8 +40,7 @@ class LogAggregator
   GRAPHQL
 
   def run
-    puts ENV.select{ |k,v| k.start_with?('BUILDKITE') }.to_h
-
+    #puts ENV.select{ |k,v| k.start_with?('BUILDKITE') }.to_h
     find_knapsack_artifacts
     aggregate_logs
   end
@@ -50,8 +49,6 @@ class LogAggregator
 
   def find_knapsack_artifacts
     puts "--- Finding knapsack artifacts in build #{BUILD}"
-    puts "FOO: #{FOO}"
-    puts GRAPHQL
     body = request(API, data: { query: GRAPHQL }, headers: HEADERS, method: "POST")
     json = JSON.parse(body)
     jobs = json.dig('data', 'build', 'jobs', 'edges').map { |edge| edge['node'] }
@@ -62,22 +59,22 @@ class LogAggregator
     aggregate_report = @artifacts.each_with_object([]) do |artifact, report|
       puts "~~~ Downloading artifact #{artifact['uuid']}"
       body = request(artifact['downloadURL'])
-      puts body
+      # puts body
       body.each_line do |line|
         json = JSON.parse(line)
-        puts json
+        #puts json
         report << json
-      rescue JSON::ParseError => _e
+      rescue JSON::ParserError => _e
         puts "unable to parse: '#{line}'"
       end
     end
     puts "report"
     puts report
 
-    #puts "--- Writing new #{REPORT} for current tests"
-    #agregate_report.select! { |test, _time| File.exist?(test) }
-    #json = JSON.pretty_generate(aggregate_report.sort.to_h)
-    #File.write('jason_report.json', json)
+    # puts "--- Writing new #{REPORT} for current tests"
+    # agregate_report.select! { |test, _time| File.exist?(test) }
+    # json = JSON.pretty_generate(aggregate_report.sort.to_h)
+    # File.write('jason_report.json', json)
   end
 
   def request(url, data: nil, headers: {}, method: 'GET')
@@ -86,10 +83,9 @@ class LogAggregator
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     response = http.send_request(method, uri.request_uri, data, headers)
-    puts response.code
-    puts response.body
+    # puts response.code
+    # puts response.body
     response.body
-    #response.body.empty? ? {} : JSON.parse(response.body)
   end
 end
 
