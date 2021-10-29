@@ -3,6 +3,7 @@ steps:
     command: ".buildkite/scripts/ci/setup.sh && .buildkite/scripts/ci/parallel_specs.sh"
     artifact_paths: "log/**/*.log"
     parallelism: 5
+    key: "ruby"
     plugins:
       - docker#v3.0.0:
           environment:
@@ -16,20 +17,20 @@ steps:
             - ./knapsack_rspec_report.json:/app/knapsack_rspec_report.json
             - ./log:/app/log
           workdir: "/app"
-  - wait
-
-  - label: "aggregate logs"
-    command: ".buildkite/scripts/ci/log_aggregator.sh"
-    artifact_paths: "log/**/*.log"
-    key: aggregate
-    plugins:
-      - docker#v3.0.0:
-          environment:
-            - BUILDKITE_API_TOKEN
-            - BUILDKITE_BUILD_NUMBER
-            - BUILDKITE_ORGANIZATION_SLUG
-            - BUILDKITE_PIPELINE_SLUG
-          image: "ruby:2.7.2"
-          volumes:
-            - ./log:/app/log
-          workdir: "/app"
+#  - wait
+#
+#  - label: "aggregate logs"
+#    command: ".buildkite/scripts/ci/log_aggregator.sh"
+#    artifact_paths: "log/**/*.log"
+#    key: aggregate
+#    plugins:
+#      - docker#v3.0.0:
+#          environment:
+#            - BUILDKITE_API_TOKEN
+#            - BUILDKITE_BUILD_NUMBER
+#            - BUILDKITE_ORGANIZATION_SLUG
+#            - BUILDKITE_PIPELINE_SLUG
+#          image: "ruby:2.7.2"
+#          volumes:
+#            - ./log:/app/log
+#          workdir: "/app"
