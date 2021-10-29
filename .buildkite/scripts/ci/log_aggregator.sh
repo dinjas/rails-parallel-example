@@ -38,6 +38,8 @@ class LogAggregator
   GRAPHQL
 
   def run
+    puts ENV.select{ |k,v| k.start_with?('BUILDKITE') }.to_h
+
     find_knapsack_artifacts
     aggregate_logs
   end
