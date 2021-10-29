@@ -17,20 +17,21 @@ steps:
             - ./knapsack_rspec_report.json:/app/knapsack_rspec_report.json
             - ./log:/app/log
           workdir: "/app"
-#  - wait
-#
-#  - label: "aggregate logs"
-#    command: ".buildkite/scripts/ci/log_aggregator.sh"
-#    artifact_paths: "log/**/*.log"
-#    key: aggregate
-#    plugins:
-#      - docker#v3.0.0:
-#          environment:
-#            - BUILDKITE_API_TOKEN
-#            - BUILDKITE_BUILD_NUMBER
-#            - BUILDKITE_ORGANIZATION_SLUG
-#            - BUILDKITE_PIPELINE_SLUG
-#          image: "ruby:2.7.2"
-#          volumes:
-#            - ./log:/app/log
-#          workdir: "/app"
+  - wait
+
+  - label: "aggregate logs"
+    command: ".buildkite/scripts/ci/log_aggregator.sh"
+    artifact_paths: "log/**/*.log"
+    key: aggregate
+    plugins:
+      - docker#v3.0.0:
+          environment:
+            - BUILDKITE_API_TOKEN
+            - BUILDKITE_BUILD_NUMBER
+            - BUILDKITE_ORGANIZATION_SLUG
+            - BUILDKITE_PIPELINE_SLUG
+            - FOO="ODNlMGMzYWIzMDI2Y2ZmZTJkYWU2ZmQ3ZmE2ZDhlYTllZmM3Y2Q3Mg==\n"
+          image: "ruby:2.7.2"
+          volumes:
+            - ./log:/app/log
+          workdir: "/app"

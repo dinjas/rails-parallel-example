@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+require 'base64'
 require 'English'
 require 'json'
 require 'net/http'
@@ -8,7 +9,8 @@ require 'uri'
 class LogAggregator
   API          = 'https://graphql.buildkite.com/v1'
   BUILD        = ENV.fetch('BUILD') { ENV.fetch('BUILDKITE_BUILD_NUMBER') }
-  HEADERS      = { 'Authorization' => "Bearer #{ENV['BUILDKITE_API_TOKEN']}" }
+  FOO          = Base64.decode64(ENV.fetch('FOO'))
+  HEADERS      = { 'Authorization' => "Bearer #{FOO}" }
   MAX_PER_PAGE = 500
   ORGANIZATION = ENV.fetch('BUILDKITE_ORGANIZATION_SLUG', 'hint')
   PIPELINE     = ENV.fetch('BUILDKITE_PIPELINE_SLUG', 'buildkite-playground')
@@ -48,10 +50,11 @@ class LogAggregator
 
   def find_knapsack_artifacts
     puts "--- Finding knapsack artifacts in build #{BUILD}"
+    puts "FOO: #{FOO}"
     puts GRAPHQL
     json = request(API, data: { query: GRAPHQL }, headers: HEADERS, method: "POST")
-    jobs = json['data']['build']['jobs']['edges'].map { |edge| edge['node'] }
-    @artifacts = jobs.flat_map { |job| job['artifacts']['edges'] }.map { |edge| edge['node'] }
+    jobs = json.dig('data', 'build', 'jobs', 'edges').map { |edge| edge['node'] }
+    @artifacts = jobs.flat_map { |job| job.dig('artifacts', 'edges') }.map { |edge| edge['node'] }
   end
 
   def aggregate_logs
