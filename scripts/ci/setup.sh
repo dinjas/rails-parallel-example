@@ -2,6 +2,8 @@
 
 set -eu
 
+bundle update --bundler
+
 bundle install
 
 npm install
