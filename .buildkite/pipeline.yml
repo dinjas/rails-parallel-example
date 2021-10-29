@@ -2,7 +2,7 @@ steps:
   - name: ":rspec:"
     command: "scripts/ci/setup.sh && scripts/ci/parallel_specs.sh"
     artifact_paths: "log/**/*.log"
-    parallelism: 20
+    parallelism: 5
     plugins:
       - docker#v3.0.0:
           image: "ruby:2.7.2"
