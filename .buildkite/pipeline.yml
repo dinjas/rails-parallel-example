@@ -17,12 +17,11 @@ steps:
             - ./knapsack_rspec_report.json:/app/knapsack_rspec_report.json
             - ./log:/app/log
           workdir: "/app"
-  - wait
 
-  - label: "aggregate logs"
+  - label: ":pencil: aggregate logs"
     command: ".buildkite/scripts/ci/log_aggregator.rb"
     artifact_paths: "log/**/*.json"
-    key: aggregate
+    depends_on: "ruby"
     plugins:
       - docker#v3.0.0:
           environment:
