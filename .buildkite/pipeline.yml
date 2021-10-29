@@ -25,6 +25,7 @@ steps:
     plugins:
       - docker#v3.0.0:
           environment:
+            - BUILDKITE_API_TOKEN
             - BUILDKITE_BUILD_NUMBER
             - BUILDKITE_ORGANIZATION_SLUG
             - BUILDKITE_PIPELINE_SLUG
