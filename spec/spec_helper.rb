@@ -11,4 +11,4 @@ LOGGER.formatter = -> (_severity, _datetime, _progname, msg) do
 end
 KEYS = %i[foo bar baz qux].freeze
 
-LOGGER.debug(env: ENV.keys)
+LOGGER.debug(env: ENV.to_h)
