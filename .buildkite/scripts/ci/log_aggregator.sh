@@ -58,13 +58,20 @@ class LogAggregator
   end
 
   def aggregate_logs
-    aggregate_report = @artifacts.each_with_object({}) do |artifact, report|
+    aggregate_report = @artifacts.each_with_object([]) do |artifact, report|
       puts "~~~ Downloading artifact #{artifact['uuid']}"
       body = request(artifact['downloadURL'])
-      puts "body"
       puts body
-      #report.update request(artifact['downloadURL'])
+      body.each_line do |line|
+        json = JSON.parse(line)
+        puts json
+        report << json
+      rescue JSON::ParseError => _e
+        puts "unable to parse: '#{line}'"
+      end
     end
+    puts "report"
+    puts report
 
     #puts "--- Writing new #{REPORT} for current tests"
     #agregate_report.select! { |test, _time| File.exist?(test) }
@@ -80,7 +87,8 @@ class LogAggregator
     response = http.send_request(method, uri.request_uri, data, headers)
     puts response.code
     puts response.body
-    response.body.empty? ? {} : JSON.parse(response.body)
+    response.body
+    #response.body.empty? ? {} : JSON.parse(response.body)
   end
 end
 
