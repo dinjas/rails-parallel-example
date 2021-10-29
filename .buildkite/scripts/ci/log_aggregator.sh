@@ -80,8 +80,7 @@ class LogAggregator
     response = http.send_request(method, uri.request_uri, data, headers)
     puts response.code
     puts response.body
-    response.body
-    # response.body.empty? ? {} : JSON.parse(response.body)
+    response.body.empty? ? {} : JSON.parse(response.body)
   end
 end
 
