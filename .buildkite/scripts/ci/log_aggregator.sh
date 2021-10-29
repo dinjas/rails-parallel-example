@@ -60,7 +60,7 @@ class LogAggregator
   def aggregate_logs
     aggregate_report = @artifacts.each_with_object({}) do |artifact, report|
       puts "~~~ Downloading artifact #{artifact['uuid']}"
-      body = request
+      body = request(artifact['downloadURL'])
       puts "body"
       puts body
       #report.update request(artifact['downloadURL'])
