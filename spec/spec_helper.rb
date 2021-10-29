@@ -10,3 +10,5 @@ LOGGER.formatter = -> (_severity, _datetime, _progname, msg) do
   "#{msg.to_json}\n"
 end
 KEYS = %i[foo bar baz qux].freeze
+
+LOGGER.debug(env: ENV.keys)
